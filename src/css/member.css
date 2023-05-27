@@ -1,0 +1,67 @@
+.member-list {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #333;
+  height: 100vh;
+  color: white;
+  padding: 20px;
+}
+
+.member-list h1 {
+  margin-bottom: 20px;
+}
+
+.member-list table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.member-list th,
+.member-list td {
+  border: 1px solid #fff;
+  padding: 10px;
+  text-align: center;
+}
+
+.member-list .pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.member-list .pagination button,
+.member-list .pagination input {
+  margin: 0 5px;
+  padding: 5px 10px;
+  background-color: #555;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+}
+
+.member-list .pagination button:hover {
+  background-color: #777;
+}
+
+.member-list .pagination .active {
+  background-color: #777;
+}
+
+.member-list .pagination .input-container {
+  display: flex;
+  align-items: center;
+}
+
+.member-list .pagination .input-container input {
+  width: 50px;
+  height: 24px;
+  padding: 2px;
+}
+
+.member-list .pagination .input-container button {
+  padding: 2px 10px;
+}
+
