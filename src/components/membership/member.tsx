@@ -3,12 +3,12 @@ import axios from 'axios';
 import '../../css/member.css';
 
 interface Member {
-  id: number;
-  name: string;
+  id: string;
+  username: string;
   phone: string;
   email: string;
-  expirationDate: string;
-  membershipLevel: string;
+  create_time: number;
+  member_expire_at: number;
 }
 
 const MemberList: React.FC = () => {
@@ -19,6 +19,7 @@ const MemberList: React.FC = () => {
   const [maxPageNumberLimit, setMaxPageNumberLimit] = useState(pageNumberLimit);
   const [minPageNumberLimit, setMinPageNumberLimit] = useState(0);
   const [inputPage, setInputPage] = useState('');
+  const memberListUrl = "http://192.168.3.124:3001/user/list"
 
   useEffect(() => {
     fetchMembers();
@@ -26,24 +27,30 @@ const MemberList: React.FC = () => {
 
   const fetchMembers = async () => {
     try {
-      // const response = await axios.get('API_ENDPOINT/members');
-      // setMembers(response.data);
+      const data = {
+        "1": "1",
+      };
+      const response = await axios.post(
+        memberListUrl,
+        data,
+      );
+      console.log(response.data);
+      setMembers(response.data.data.users);
 
-      // TODO: for test
-      const fakeMembers: Member[] = [];
-      for (let i = 1; i <= 3000; i++) {
-        const member: Member = {
-          id: i,
-          name: `Member ${i}`,
-          phone: `123-456-${i.toString().padStart(2, '0')}`,
-          email: `member${i}@example.com`,
-          expirationDate: '2023-12-31',
-          membershipLevel: 'Gold',
-        };
-        fakeMembers.push(member);
-      }
+      // // TODO: for test
+      // const fakeMembers: Member[] = [];
+      // for (let i = 1; i <= 3000; i++) {
+      //   const member: Member = {
+      //     id: i,
+      //     name: `Member ${i}`,
+      //     phone: `123-456-${i.toString().padStart(2, '0')}`,
+      //     email: `member${i}@example.com`,
+      //     expirationDate: '2023-12-31',
+      //   };
+      //   fakeMembers.push(member);
+      // }
+      // setMembers(fakeMembers);
 
-      setMembers(fakeMembers);
     } catch (error) {
       console.log(error);
     }
@@ -112,27 +119,43 @@ const MemberList: React.FC = () => {
     return [left_half, right_half];
   }
 
+  function formatTimestamp(timestamp: number): string {
+    console.log(timestamp);
+    if (Number(timestamp) === 0) {
+      return "非会员";
+    }
+    const date = new Date(Number(timestamp) * 1000);
+    const year = date.getFullYear();
+    const month = ('0' + (date.getMonth() + 1)).slice(-2);
+    const day = ('0' + date.getDate()).slice(-2);
+    const hours = ('0' + date.getHours()).slice(-2);
+    const minutes = ('0' + date.getMinutes()).slice(-2);
+    const seconds = ('0' + date.getSeconds()).slice(-2);
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  }
+
+
   return (
     <div className="member-list">
       <h1>Member List</h1>
       <table>
         <thead>
           <tr>
-            <th>Name</th>
-            <th>Phone</th>
-            <th>Email</th>
-            <th>Expiration Date</th>
-            <th>Membership Level</th>
+            <th>用户昵称</th>
+            <th>手机号</th>
+            <th>邮箱</th>
+            <th>注册时间</th>
+            <th>到期时间</th>
           </tr>
         </thead>
         <tbody>
           {currentMembers.map((member) => (
             <tr key={member.id}>
-              <td>{member.name}</td>
+              <td>{member.username}</td>
               <td>{member.phone}</td>
               <td>{member.email}</td>
-              <td>{member.expirationDate}</td>
-              <td>{member.membershipLevel}</td>
+              <td>{formatTimestamp(member.create_time)}</td>
+              <td>{formatTimestamp(member.member_expire_at)}</td>
             </tr>
           ))}
         </tbody>
