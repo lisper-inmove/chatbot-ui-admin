@@ -10,6 +10,8 @@ interface Member {
   email: string;
   create_time: number;
   vip_expire_at: number;
+  is_disabled: boolean;
+  is_vip: boolean;
 }
 
 const MemberList: React.FC = () => {
@@ -126,9 +128,9 @@ const MemberList: React.FC = () => {
     return [left_half, right_half];
   }
 
-  function formatTimestamp(timestamp: number): string {
-    if (Number(timestamp) === 0) {
-      return "非会员";
+  function formatTimestamp(timestamp: number, is_vip: boolean): string {
+    if (!is_vip) {
+      return "未订阅";
     }
     const date = new Date(Number(timestamp) * 1000);
     const year = date.getFullYear();
@@ -153,6 +155,16 @@ const MemberList: React.FC = () => {
           disableVipUrl,
           data,
         );
+        const updatedMembers = members.map((member) => {
+          if (member.id === userId) {
+            return {
+              ...member,
+              is_disabled: disable === "true",
+            };
+          }
+          return member;
+        });
+        setMembers(updatedMembers);
         alert(response.data.msg);
       } catch (error) {
         console.log(error);
@@ -197,7 +209,7 @@ const MemberList: React.FC = () => {
               <td>{member.username}</td>
               <td>{member.phone}</td>
               <td>{member.email}</td>
-              <td>{formatTimestamp(member.create_time)}</td>
+              <td>{formatTimestamp(member.create_time, true)}</td>
               <td>
                 {editingMember && editingMember.id === member.id && showDatePicker ? (
                   <MyDatePicker
@@ -207,13 +219,27 @@ const MemberList: React.FC = () => {
                   />
                 ) : (
                   <span onClick={() => toggleDatePicker(member)}>
-                    {formatTimestamp(member.vip_expire_at)}
+                    {formatTimestamp(member.vip_expire_at, member.is_vip)}
                   </span>
                 )}
               </td>
               <td>
-                <button onClick={disableVip} data-userid={member.id} data-disable={true}>禁用</button>
-                <button onClick={disableVip} data-userid={member.id} data-disable={false}>启用</button>
+                <button 
+                  onClick={disableVip} 
+                  data-userid={member.id} 
+                  data-disable={true}
+                  className={!member.is_disabled ? "un-highlight" : ""}
+                >
+                  禁用
+                </button>
+                <button 
+                  onClick={disableVip} 
+                  data-userid={member.id} 
+                  data-disable={false}
+                  className={member.is_disabled ? "un-highlight" : ""}
+                >
+                  启用
+                </button>
               </td>
             </tr>
           ))}

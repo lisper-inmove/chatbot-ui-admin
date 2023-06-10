@@ -66,3 +66,7 @@
 .member-list .pagination .input-container button {
   padding: 2px 10px;
 }
+
+.un-highlight {
+  background-color: black;
+}
