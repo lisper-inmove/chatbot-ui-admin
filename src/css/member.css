@@ -16,6 +16,7 @@
 .member-list table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
 }
 
 .member-list th,
@@ -23,6 +24,7 @@
   border: 1px solid #fff;
   padding: 10px;
   text-align: center;
+  width: 200px;
 }
 
 .member-list .pagination {
@@ -64,4 +66,3 @@
 .member-list .pagination .input-container button {
   padding: 2px 10px;
 }
-

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import MyDatePicker from '../utils/myDatePicker';
 import axios from 'axios';
 import '../../css/member.css';
 
@@ -8,7 +9,7 @@ interface Member {
   phone: string;
   email: string;
   create_time: number;
-  member_expire_at: number;
+  vip_expire_at: number;
 }
 
 const MemberList: React.FC = () => {
@@ -19,7 +20,12 @@ const MemberList: React.FC = () => {
   const [maxPageNumberLimit, setMaxPageNumberLimit] = useState(pageNumberLimit);
   const [minPageNumberLimit, setMinPageNumberLimit] = useState(0);
   const [inputPage, setInputPage] = useState('');
-  const memberListUrl = "http://192.168.3.124:3001/user/list"
+  const [editingMember, setEditingMember] = useState<Member | null>(null);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const host = "https://agi.ailogy.cn/chatbot"
+  const memberListUrl = `${host}/user/list`;
+  const disableVipUrl = `${host}/user/disable-or-enable-vip`;
+  const changeVipExpireTimeUrl = `${host}/user/extend-vip-expire-time`;
 
   useEffect(() => {
     fetchMembers();
@@ -34,39 +40,43 @@ const MemberList: React.FC = () => {
         memberListUrl,
         data,
       );
-      console.log(response.data);
       setMembers(response.data.data.users);
-
-      // // TODO: for test
-      // const fakeMembers: Member[] = [];
-      // for (let i = 1; i <= 3000; i++) {
-      //   const member: Member = {
-      //     id: i,
-      //     name: `Member ${i}`,
-      //     phone: `123-456-${i.toString().padStart(2, '0')}`,
-      //     email: `member${i}@example.com`,
-      //     expirationDate: '2023-12-31',
-      //   };
-      //   fakeMembers.push(member);
-      // }
-      // setMembers(fakeMembers);
-
     } catch (error) {
       console.log(error);
     }
   };
 
-  // 获取当前页的会员列表
+  const toggleDatePicker = (member: Member) => {
+    setEditingMember(member);
+    setShowDatePicker(!showDatePicker);
+  };
+
+  const updateExpirationDate = (newDate: string) => {
+    if (editingMember) {
+      // TODO: 发送更新到期时间的请求
+      // 更新成员列表中对应成员的到期时间
+      const updatedMembers = members.map((member) => {
+        if (member.id === editingMember.id) {
+          return {
+            ...member,
+            vip_expire_at: new Date(newDate).getTime() / 1000
+          };
+        }
+        return member;
+      });
+      setMembers(updatedMembers);
+      toggleDatePicker(editingMember);
+    }
+  };
+
   const indexOfLastMember = currentPage * membersPerPage;
   const indexOfFirstMember = indexOfLastMember - membersPerPage;
   const currentMembers = members.slice(indexOfFirstMember, indexOfLastMember);
 
-  // 分页切换
   const paginate = (pageNumber: number) => {
     setCurrentPage(pageNumber);
   };
 
-  // 下一页
   const nextPage = () => {
     if (currentPage < Math.ceil(members.length / membersPerPage)) {
       setCurrentPage(currentPage + 1);
@@ -78,7 +88,6 @@ const MemberList: React.FC = () => {
     }
   };
 
-  // 上一页
   const prevPage = () => {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
@@ -90,7 +99,6 @@ const MemberList: React.FC = () => {
     }
   };
 
-  // 跳转到指定页
   const goToPage = () => {
     const currentPage = parseInt(inputPage);
     if (currentPage >= 1 && currentPage <= Math.ceil(members.length / membersPerPage)) {
@@ -109,7 +117,6 @@ const MemberList: React.FC = () => {
     }
     const left_half = currentPage - pageNumberLimit / 2;
     const right_half = currentPage + pageNumberLimit / 2;
-    console.log(left_half, right_half);
     if (left_half <= 1) {
       return [0, right_half - left_half];
     }
@@ -120,7 +127,6 @@ const MemberList: React.FC = () => {
   }
 
   function formatTimestamp(timestamp: number): string {
-    console.log(timestamp);
     if (Number(timestamp) === 0) {
       return "非会员";
     }
@@ -134,6 +140,42 @@ const MemberList: React.FC = () => {
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
   }
 
+  const disableVip = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    const userId = event.currentTarget.getAttribute('data-userid');
+    const disable = event.currentTarget.getAttribute('data-disable');
+    if (userId) {
+      try {
+        const data = {
+          "user_id": userId,
+          "disable": disable === "true",
+        };
+        const response = await axios.post(
+          disableVipUrl,
+          data,
+        );
+        alert(response.data.msg);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
+  const onExpireDateChange = async (date: Date, id: string) => {
+    console.log(date);
+    try {
+      const data = {
+        "user_id": id,
+        "vip_expire_at": date.getTime() / 1000,
+      };
+      const response = await axios.post(
+        changeVipExpireTimeUrl,
+        data,
+      );
+      alert(response.data.msg);
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   return (
     <div className="member-list">
@@ -146,6 +188,7 @@ const MemberList: React.FC = () => {
             <th>邮箱</th>
             <th>注册时间</th>
             <th>到期时间</th>
+            <th>操作</th>
           </tr>
         </thead>
         <tbody>
@@ -155,7 +198,23 @@ const MemberList: React.FC = () => {
               <td>{member.phone}</td>
               <td>{member.email}</td>
               <td>{formatTimestamp(member.create_time)}</td>
-              <td>{formatTimestamp(member.member_expire_at)}</td>
+              <td>
+                {editingMember && editingMember.id === member.id && showDatePicker ? (
+                  <MyDatePicker
+                    selected={member.vip_expire_at == 0 ? new Date() : new Date(member.vip_expire_at * 1000)}
+                    onChange={onExpireDateChange}
+                    userId={member.id}
+                  />
+                ) : (
+                  <span onClick={() => toggleDatePicker(member)}>
+                    {formatTimestamp(member.vip_expire_at)}
+                  </span>
+                )}
+              </td>
+              <td>
+                <button onClick={disableVip} data-userid={member.id} data-disable={true}>禁用</button>
+                <button onClick={disableVip} data-userid={member.id} data-disable={false}>启用</button>
+              </td>
             </tr>
           ))}
         </tbody>
