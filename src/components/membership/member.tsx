@@ -24,7 +24,7 @@ const MemberList: React.FC = () => {
   const [inputPage, setInputPage] = useState('');
   const [editingMember, setEditingMember] = useState<Member | null>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const host = "https://agi.ailogy.cn/chatbot"
+  const host = "https://agi.ailogy.cn/api"
   const memberListUrl = `${host}/user/list`;
   const disableVipUrl = `${host}/user/disable-or-enable-vip`;
   const changeVipExpireTimeUrl = `${host}/user/set-vip-expire-time`;
@@ -223,17 +223,17 @@ const MemberList: React.FC = () => {
                 )}
               </td>
               <td>
-                <button 
-                  onClick={disableVip} 
-                  data-userid={member.id} 
+                <button
+                  onClick={disableVip}
+                  data-userid={member.id}
                   data-disable={true}
                   className={!member.is_disabled ? "un-highlight" : ""}
                 >
                   禁用
                 </button>
-                <button 
-                  onClick={disableVip} 
-                  data-userid={member.id} 
+                <button
+                  onClick={disableVip}
+                  data-userid={member.id}
                   data-disable={false}
                   className={member.is_disabled ? "un-highlight" : ""}
                 >
@@ -271,4 +271,3 @@ const MemberList: React.FC = () => {
 };
 
 export default MemberList;
-

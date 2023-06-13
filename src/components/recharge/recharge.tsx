@@ -14,9 +14,7 @@ interface RechargeConfig {
 const RechargeList: React.FC = () => {
   const [rechargeList, setRechargeList] = useState<RechargeConfig[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
-  const host = "https://agi.ailogy.cn/chatbot"
-  const recharge_config_list_url = `${host}/recharge-config/list`
-  const recharge_config_update_status_url = `${host}/recharge-config/update-status`
+  const host = "https://agi.ailogy.cn/api";
   const recharge_config_list_url = `${host}/recharge-config/list`;
   const recharge_config_update_status_url = `${host}/recharge-config/update-status`;
   const recharge_config_create_url = `${host}/recharge-config/create`;
