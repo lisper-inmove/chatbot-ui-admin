@@ -1,0 +1,193 @@
+.recharge-list {
+  flex: 1;
+  background-color: #333;
+  color: white;
+  padding: 20px;
+}
+
+.recharge-list h1 {
+  margin-bottom: 20px;
+}
+
+.recharge-list table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.recharge-list th,
+.recharge-list td {
+  border: 1px solid #fff;
+  padding: 10px;
+  text-align: center;
+  width: 200px;
+}
+
+.recharge-list .pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.recharge-list .pagination button,
+.recharge-list .pagination input {
+  margin: 0 5px;
+  padding: 5px 10px;
+  background-color: #555;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+}
+
+.recharge-list .pagination button:hover {
+  background-color: #777;
+}
+
+.recharge-list .pagination .active {
+  background-color: #777;
+}
+
+.recharge-list .pagination .input-container {
+  display: flex;
+  align-items: center;
+}
+
+.recharge-list .pagination .input-container input {
+  width: 50px;
+  height: 24px;
+  padding: 2px;
+}
+
+.recharge-list .pagination .input-container button {
+  padding: 2px 10px;
+}
+
+.un-highlight {
+  background-color: black;
+}
+
+.add-button-container {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 20px;
+}
+
+.add-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #f2f2f2;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.add-button:hover {
+  background-color: #e0e0e0;
+}
+
+
+/* 遮罩层样式 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* 半透明黑色背景 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999; /* 确保遮罩层在最顶层 */
+}
+
+/* 弹出窗口容器样式 */
+.modal-container {
+  background-color: #fff;
+  border-radius: 4px;
+  padding: 20px;
+  max-width: 500px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* 弹出窗口标题样式 */
+.modal-container h2 {
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+/* 弹出窗口按钮样式 */
+.modal-container button {
+  margin-right: 10px;
+}
+
+/* 弹出窗口关闭按钮样式 */
+.modal-container .close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #888;
+}
+
+.modal-container {
+  background-color: #555;
+}
+
+.add-config {
+  width: 400px;
+}
+
+.input-field {
+  display: block;
+  width: 90%;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  outline: none;
+  margin-bottom: 10px;
+  background-color: #333;
+  color: #aff;
+}
+
+.input-field:focus {
+  border-color: lightblue;
+}
+
+.cancel-button,.save-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #fff;
+  color: #333;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.cancel-button:hover,.save-button:hover {
+  background-color: #f5f5f5;
+}
+
+.cancel-button:focus,.save-button:focus {
+  outline: none;
+}
+
+.cancel-button:active,.save-button:active {
+  background-color: #e6e6e6;
+}
+
+.error {
+  border: 2px solid red;
+}
+
+.error-message {
+  color: red;
+  margin-top: 5px;
+}
+

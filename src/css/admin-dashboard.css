@@ -1,37 +1,41 @@
-.member-list {
-  flex: 1;
+.admin-dashboard {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   background-color: #333;
+  height: 100vh;
   color: white;
   padding: 20px;
 }
 
-.member-list h1 {
+.admin-dashboard h1 {
   margin-bottom: 20px;
 }
 
-.member-list table {
+.admin-dashboard table {
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
 }
 
-.member-list th,
-.member-list td {
+.admin-dashboard th,
+.admin-dashboard td {
   border: 1px solid #fff;
   padding: 10px;
   text-align: center;
   width: 200px;
 }
 
-.member-list .pagination {
+.admin-dashboard .pagination {
   display: flex;
   justify-content: center;
   align-items: center;
   margin-top: 20px;
 }
 
-.member-list .pagination button,
-.member-list .pagination input {
+.admin-dashboard .pagination button,
+.admin-dashboard .pagination input {
   margin: 0 5px;
   padding: 5px 10px;
   background-color: #555;
@@ -40,26 +44,26 @@
   cursor: pointer;
 }
 
-.member-list .pagination button:hover {
+.admin-dashboard .pagination button:hover {
   background-color: #777;
 }
 
-.member-list .pagination .active {
+.admin-dashboard .pagination .active {
   background-color: #777;
 }
 
-.member-list .pagination .input-container {
+.admin-dashboard .pagination .input-container {
   display: flex;
   align-items: center;
 }
 
-.member-list .pagination .input-container input {
+.admin-dashboard .pagination .input-container input {
   width: 50px;
   height: 24px;
   padding: 2px;
 }
 
-.member-list .pagination .input-container button {
+.admin-dashboard .pagination .input-container button {
   padding: 2px 10px;
 }
 

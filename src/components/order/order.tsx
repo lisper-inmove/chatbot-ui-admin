@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import MyDatePicker from '../utils/myDatePicker';
 import axios from 'axios';
-import '../../css/member.css';
+import '../../css/admin-dashboard.css';
 
 interface Member {
   id: string;
@@ -14,7 +14,7 @@ interface Member {
   is_vip: boolean;
 }
 
-const MemberList: React.FC = () => {
+const OrderList: React.FC = () => {
   const [members, setMembers] = useState<Member[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [membersPerPage] = useState(10);
@@ -24,10 +24,11 @@ const MemberList: React.FC = () => {
   const [inputPage, setInputPage] = useState('');
   const [editingMember, setEditingMember] = useState<Member | null>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const host = "https://agi.ailogy.cn/chatbot"
+  // const host = "https://agi.ailogy.cn/chatbot"
+  const host = "http://192.168.3.124:3001"
   const memberListUrl = `${host}/user/list`;
   const disableVipUrl = `${host}/user/disable-or-enable-vip`;
-  const changeVipExpireTimeUrl = `${host}/user/set-vip-expire-time`;
+  const changeVipExpireTimeUrl = `${host}/user/extend-vip-expire-time`;
 
   useEffect(() => {
     fetchMembers();
@@ -190,7 +191,8 @@ const MemberList: React.FC = () => {
   }
 
   return (
-    <div className="member-list">
+    <div className="admin-dashboard">
+      <h1>后台管理</h1>
       <table>
         <thead>
           <tr>
@@ -212,7 +214,7 @@ const MemberList: React.FC = () => {
               <td>
                 {editingMember && editingMember.id === member.id && showDatePicker ? (
                   <MyDatePicker
-                    selected={Number(member.vip_expire_at) === 0 ? new Date() : new Date(member.vip_expire_at * 1000)}
+                    selected={member.vip_expire_at === 0 ? new Date() : new Date(member.vip_expire_at * 1000)}
                     onChange={onExpireDateChange}
                     userId={member.id}
                   />
@@ -270,5 +272,4 @@ const MemberList: React.FC = () => {
   );
 };
 
-export default MemberList;
-
+export default OrderList;
