@@ -24,7 +24,7 @@ const MemberList: React.FC = () => {
   const [inputPage, setInputPage] = useState('');
   const [editingMember, setEditingMember] = useState<Member | null>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const host = "https://agi.ailogy.cn/api"
+  const host = "https://admin.ailogy.cn/api"
   const memberListUrl = `${host}/user/list`;
   const disableVipUrl = `${host}/user/disable-or-enable-vip`;
   const changeVipExpireTimeUrl = `${host}/user/set-vip-expire-time`;
