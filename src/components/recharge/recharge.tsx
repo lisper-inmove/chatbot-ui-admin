@@ -17,6 +17,9 @@ const RechargeList: React.FC = () => {
   const host = "https://agi.ailogy.cn/chatbot"
   const recharge_config_list_url = `${host}/recharge-config/list`
   const recharge_config_update_status_url = `${host}/recharge-config/update-status`
+  const recharge_config_list_url = `${host}/recharge-config/list`;
+  const recharge_config_update_status_url = `${host}/recharge-config/update-status`;
+  const recharge_config_create_url = `${host}/recharge-config/create`;
 
   useEffect(() => {
     fetchRechargeList();
@@ -44,9 +47,22 @@ const RechargeList: React.FC = () => {
   };
 
   // 保存新增配置的处理函数
-  const handleSaveConfig = (newConfig: any) => {
+  const handleSaveConfig = async (newConfig: any) => {
     // 这里可以实现保存配置的逻辑
     // 在完成保存后，通过调用 fetchRechargeList() 函数来更新表格数据
+    try {
+      const data = {
+        "name": newConfig.name,
+        "valid_periods": newConfig.days * 24 * 60 * 60,
+        "price": newConfig.amount * 100,
+      };
+      const response = await axios.post(
+        recharge_config_create_url,
+        data
+      ); // Replace with your API endpoint
+    } catch (error) {
+      console.error('Error fetching recharge list:', error);
+    }
     fetchRechargeList();
     setShowAddModal(false);
   };
