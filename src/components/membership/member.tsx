@@ -26,6 +26,7 @@ const MemberList: React.FC = () => {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const host = "https://admin.ailogy.cn/api"
   const memberListUrl = `${host}/user/list`;
+  const memberListByUsernameUrl = `${host}/user/list-by-username`;
   const disableVipUrl = `${host}/user/disable-or-enable-vip`;
   const changeVipExpireTimeUrl = `${host}/user/set-vip-expire-time`;
 
@@ -189,14 +190,47 @@ const MemberList: React.FC = () => {
     }
   }
 
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isEnterPressed, setIsEnterPressed] = useState(false);
+  const [lastCreateTime, setLastCreateTime] = useState(0);
+
+  const handleKeyDown = async (e: any) => {
+    if (e.key === 'Enter') {
+      try {
+        const data = {
+          "username": searchTerm,
+          "lastCreateTime": lastCreateTime === 0 ? '0' : lastCreateTime,
+        };
+        const response = await axios.post(
+          memberListByUsernameUrl,
+          data,
+        );
+
+        setMembers(response.data.data.users);
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      setSearchTerm(e.target.value);
+    }
+  };
+
   return (
     <div className="member-list">
+      <input
+        type="text"
+        placeholder="搜索用户"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        onKeyDown={(e) => handleKeyDown(e)}
+        className="search-input"
+      />
+      <br />
+      <br />
       <table>
         <thead>
           <tr>
-            <th>用户昵称</th>
-            <th>手机号</th>
-            <th>邮箱</th>
+            <th>账号</th>
             <th>注册时间</th>
             <th>到期时间</th>
             <th>操作</th>
@@ -206,8 +240,6 @@ const MemberList: React.FC = () => {
           {currentMembers.map((member) => (
             <tr key={member.id}>
               <td>{member.username}</td>
-              <td>{member.phone}</td>
-              <td>{member.email}</td>
               <td>{formatTimestamp(member.create_time, true)}</td>
               <td>
                 {editingMember && editingMember.id === member.id && showDatePicker ? (

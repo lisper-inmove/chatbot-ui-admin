@@ -66,3 +66,17 @@
 .un-highlight {
   background-color: black;
 }
+
+.search-input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #blue;
+  box-shadow: 0 0 5px #blue;
+}
+

@@ -1,87 +1,69 @@
 import React, { useState, useEffect } from 'react';
 import MyDatePicker from '../utils/myDatePicker';
 import axios from 'axios';
-import '../../css/admin-dashboard.css';
+import '../../css/order.css';
 
-interface Member {
+interface Order {
   id: string;
-  username: string;
-  phone: string;
-  email: string;
+  status: string;
+  pay_method: string;
+  type: string;
+  third_party_id: string;
   create_time: number;
-  vip_expire_at: number;
-  is_disabled: boolean;
-  is_vip: boolean;
+  success_time: number;
+  pay_fee: number;
 }
 
 const OrderList: React.FC = () => {
-  const [members, setMembers] = useState<Member[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [membersPerPage] = useState(10);
+  const [ordersPerPage] = useState(10);
   const [pageNumberLimit] = useState(10);
   const [maxPageNumberLimit, setMaxPageNumberLimit] = useState(pageNumberLimit);
   const [minPageNumberLimit, setMinPageNumberLimit] = useState(0);
   const [inputPage, setInputPage] = useState('');
-  const [editingMember, setEditingMember] = useState<Member | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isEnterPressed, setIsEnterPressed] = useState(false);
+  const [editingOrder, setEditingOrder] = useState<Order | null>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
-  // const host = "https://agi.ailogy.cn/chatbot"
-  const host = "http://192.168.3.124:3001"
-  const memberListUrl = `${host}/user/list`;
-  const disableVipUrl = `${host}/user/disable-or-enable-vip`;
-  const changeVipExpireTimeUrl = `${host}/user/extend-vip-expire-time`;
+  const [lastCreateTime, setLastCreateTime] = useState(0);
+  const host = "https://agi.ailogy.cn/api"
+  const orderListUrl = `${host}/transaction/list`;
+  const orderListByStatusUrl = `${host}/transaction/list-by-status`;
+  const indexOfLastOrder = currentPage * ordersPerPage;
+  const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
+  const currentOrders = orders.slice(indexOfFirstOrder, indexOfLastOrder);
+
 
   useEffect(() => {
-    fetchMembers();
+    fetchOrders();
   }, []);
 
-  const fetchMembers = async () => {
+  const fetchOrders = async () => {
     try {
       const data = {
         "1": "1",
+        "lastCreateTime": lastCreateTime === 0 ? '0' : lastCreateTime,
       };
       const response = await axios.post(
-        memberListUrl,
+        orderListUrl,
         data,
       );
-      setMembers(response.data.data.users);
+      setOrders(response.data.data.transactions);
+      if (orders.length > 0) {
+        setLastCreateTime(orders[orders.length - 1].create_time);
+      }
     } catch (error) {
       console.log(error);
     }
   };
-
-  const toggleDatePicker = (member: Member) => {
-    setEditingMember(member);
-    setShowDatePicker(!showDatePicker);
-  };
-
-  const updateExpirationDate = (newDate: string) => {
-    if (editingMember) {
-      // TODO: 发送更新到期时间的请求
-      // 更新成员列表中对应成员的到期时间
-      const updatedMembers = members.map((member) => {
-        if (member.id === editingMember.id) {
-          return {
-            ...member,
-            vip_expire_at: new Date(newDate).getTime() / 1000
-          };
-        }
-        return member;
-      });
-      setMembers(updatedMembers);
-      toggleDatePicker(editingMember);
-    }
-  };
-
-  const indexOfLastMember = currentPage * membersPerPage;
-  const indexOfFirstMember = indexOfLastMember - membersPerPage;
-  const currentMembers = members.slice(indexOfFirstMember, indexOfLastMember);
 
   const paginate = (pageNumber: number) => {
     setCurrentPage(pageNumber);
   };
 
   const nextPage = () => {
-    if (currentPage < Math.ceil(members.length / membersPerPage)) {
+    if (currentPage < Math.ceil(orders.length / ordersPerPage)) {
       setCurrentPage(currentPage + 1);
 
       if (currentPage + 1 > maxPageNumberLimit) {
@@ -104,7 +86,7 @@ const OrderList: React.FC = () => {
 
   const goToPage = () => {
     const currentPage = parseInt(inputPage);
-    if (currentPage >= 1 && currentPage <= Math.ceil(members.length / membersPerPage)) {
+    if (currentPage >= 1 && currentPage <= Math.ceil(orders.length / ordersPerPage)) {
       setCurrentPage(currentPage);
       const [l, r] = getNumbersWhenGo(currentPage);
       setMaxPageNumberLimit(r);
@@ -114,7 +96,7 @@ const OrderList: React.FC = () => {
   };
 
   function getNumbersWhenGo(currentPage: number): [number, number] {
-    const maxPageNumber = Math.ceil(members.length / membersPerPage);
+    const maxPageNumber = Math.ceil(orders.length / ordersPerPage);
     if (maxPageNumber <= pageNumberLimit) {
       return [0, maxPageNumber];
     }
@@ -129,9 +111,9 @@ const OrderList: React.FC = () => {
     return [left_half, right_half];
   }
 
-  function formatTimestamp(timestamp: number, is_vip: boolean): string {
-    if (!is_vip) {
-      return "未订阅";
+  function formatTimestamp(timestamp: number): string {
+    if (Number(timestamp) === 0) {
+      return "未支付";
     }
     const date = new Date(Number(timestamp) * 1000);
     const year = date.getFullYear();
@@ -143,112 +125,73 @@ const OrderList: React.FC = () => {
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
   }
 
-  const disableVip = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    const userId = event.currentTarget.getAttribute('data-userid');
-    const disable = event.currentTarget.getAttribute('data-disable');
-    if (userId) {
+  const handleKeyDown = async (e: any) => {
+    console.log(e.target.value);
+    if (e.key === 'Enter') {
       try {
         const data = {
-          "user_id": userId,
-          "disable": disable === "true",
+          "1": "1",
+          "status": searchTerm,
+          "lastCreateTime": lastCreateTime === 0 ? '0' : lastCreateTime,
         };
         const response = await axios.post(
-          disableVipUrl,
+          orderListByStatusUrl,
           data,
         );
-        const updatedMembers = members.map((member) => {
-          if (member.id === userId) {
-            return {
-              ...member,
-              is_disabled: disable === "true",
-            };
-          }
-          return member;
+
+        // 根据搜索词过滤订单数据
+        const filteredOrders = response.data.data.transactions.filter((order: Order) => {
+          // 这里假设你要根据订单状态进行搜索
+          setLastCreateTime(order.create_time);
+          return order.status.includes(e.target.value);
         });
-        setMembers(updatedMembers);
-        alert(response.data.msg);
+        setOrders(filteredOrders);
       } catch (error) {
         console.log(error);
       }
+    } else {
+      setSearchTerm(e.target.value);
     }
   };
 
-  const onExpireDateChange = async (date: Date, id: string) => {
-    console.log(date);
-    try {
-      const data = {
-        "user_id": id,
-        "vip_expire_at": date.getTime() / 1000,
-      };
-      const response = await axios.post(
-        changeVipExpireTimeUrl,
-        data,
-      );
-      alert(response.data.msg);
-    } catch (error) {
-      console.log(error);
-    }
-  }
 
   return (
-    <div className="admin-dashboard">
-      <h1>后台管理</h1>
+    <div className="order-list">
+      <input
+        type="text"
+        placeholder="搜索订单状态"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        onKeyDown={(e) => handleKeyDown(e)}
+        className="search-input"
+      />
+      <br />
+      <br />
       <table>
         <thead>
           <tr>
-            <th>用户昵称</th>
-            <th>手机号</th>
-            <th>邮箱</th>
-            <th>注册时间</th>
-            <th>到期时间</th>
-            <th>操作</th>
+            <th>订单ID</th>
+            <th>第三方订单ID</th>
+            <th>订单状态</th>
+            <th>创建时间</th>
+            <th>支付完成时间</th>
           </tr>
         </thead>
         <tbody>
-          {currentMembers.map((member) => (
-            <tr key={member.id}>
-              <td>{member.username}</td>
-              <td>{member.phone}</td>
-              <td>{member.email}</td>
-              <td>{formatTimestamp(member.create_time, true)}</td>
-              <td>
-                {editingMember && editingMember.id === member.id && showDatePicker ? (
-                  <MyDatePicker
-                    selected={member.vip_expire_at === 0 ? new Date() : new Date(member.vip_expire_at * 1000)}
-                    onChange={onExpireDateChange}
-                    userId={member.id}
-                  />
-                ) : (
-                  <span onClick={() => toggleDatePicker(member)}>
-                    {formatTimestamp(member.vip_expire_at, member.is_vip)}
-                  </span>
-                )}
-              </td>
-              <td>
-                <button 
-                  onClick={disableVip} 
-                  data-userid={member.id} 
-                  data-disable={true}
-                  className={!member.is_disabled ? "un-highlight" : ""}
-                >
-                  禁用
-                </button>
-                <button 
-                  onClick={disableVip} 
-                  data-userid={member.id} 
-                  data-disable={false}
-                  className={member.is_disabled ? "un-highlight" : ""}
-                >
-                  启用
-                </button>
-              </td>
+          {currentOrders.map((order) => (
+            <tr key={order.id}>
+              <td>{order.id}</td>
+              <td>{order.third_party_id}</td>
+              <td>{order.status}</td>
+              <td>{formatTimestamp(order.create_time)}</td>
+              <td>{formatTimestamp(order.success_time)}</td>
             </tr>
           ))}
         </tbody>
       </table>
       <div className="pagination">
         <button onClick={prevPage} disabled={currentPage === 1}>Prev</button>
-        {Array.from({ length: Math.ceil(members.length / membersPerPage) }).map((_, index) => {
+        {Array.from({ length: Math.ceil(orders.length / ordersPerPage) }).map((_, index) => {
           if (index < maxPageNumberLimit && index >= minPageNumberLimit) {
             return (
               <button
@@ -262,9 +205,9 @@ const OrderList: React.FC = () => {
           }
           return null;
         })}
-        <button onClick={nextPage} disabled={currentPage === Math.ceil(members.length / membersPerPage)}>Next</button>
+        <button onClick={nextPage} disabled={currentPage === Math.ceil(orders.length / ordersPerPage)}>Next</button>
         <div className="input-container">
-          <input type="number" min="1" max={Math.ceil(members.length / membersPerPage)} value={inputPage} onChange={(e) => setInputPage(e.target.value)} />
+          <input type="number" min="1" max={Math.ceil(orders.length / ordersPerPage)} value={inputPage} onChange={(e) => setInputPage(e.target.value)} />
           <button onClick={goToPage}>Go</button>
         </div>
       </div>
