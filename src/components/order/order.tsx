@@ -27,7 +27,7 @@ const OrderList: React.FC = () => {
   const [editingOrder, setEditingOrder] = useState<Order | null>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [lastCreateTime, setLastCreateTime] = useState(0);
-  const host = "https://agi.ailogy.cn/api"
+  const host = "https://admin.ailogy.cn/api"
   const orderListUrl = `${host}/transaction/list`;
   const orderListByStatusUrl = `${host}/transaction/list-by-status`;
   const indexOfLastOrder = currentPage * ordersPerPage;

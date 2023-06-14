@@ -24,7 +24,7 @@ const MemberList: React.FC = () => {
   const [inputPage, setInputPage] = useState('');
   const [editingMember, setEditingMember] = useState<Member | null>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const host = "https://admin.ailogy.cn/api"
+  const host = "https://admin.ailogy.cn/api";
   const memberListUrl = `${host}/user/list`;
   const memberListByUsernameUrl = `${host}/user/list-by-username`;
   const disableVipUrl = `${host}/user/disable-or-enable-vip`;
