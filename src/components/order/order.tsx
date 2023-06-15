@@ -12,6 +12,7 @@ interface Order {
   create_time: number;
   success_time: number;
   pay_fee: number;
+  username: string;
 }
 
 const OrderList: React.FC = () => {
@@ -27,7 +28,7 @@ const OrderList: React.FC = () => {
   const [editingOrder, setEditingOrder] = useState<Order | null>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [lastCreateTime, setLastCreateTime] = useState(0);
-  const host = "https://admin.ailogy.cn/api"
+  const host = "https://admin.ailogy.cn/api";
   const orderListUrl = `${host}/transaction/list`;
   const orderListByStatusUrl = `${host}/transaction/list-by-status`;
   const indexOfLastOrder = currentPage * ordersPerPage;
@@ -170,8 +171,10 @@ const OrderList: React.FC = () => {
       <table>
         <thead>
           <tr>
+            <th>账号</th>
             <th>订单ID</th>
             <th>第三方订单ID</th>
+            <th>支付金额</th>
             <th>订单状态</th>
             <th>创建时间</th>
             <th>支付完成时间</th>
@@ -180,8 +183,10 @@ const OrderList: React.FC = () => {
         <tbody>
           {currentOrders.map((order) => (
             <tr key={order.id}>
+              <td>{order.username}</td>
               <td>{order.id}</td>
               <td>{order.third_party_id}</td>
+              <td>{order.pay_fee / 100}元</td>
               <td>{order.status}</td>
               <td>{formatTimestamp(order.create_time)}</td>
               <td>{formatTimestamp(order.success_time)}</td>
